@@ -554,7 +554,7 @@ fi
 # root=nfs4:[<server-ip>:]<root-dir>[:<nfs-options>]
 nfsroot_to_var() {
     # strip nfs[4]:
-    local arg="$@:"
+    local arg="$*:"
     nfs="${arg%%:*}"
     arg="${arg#"$nfs":}"
 
