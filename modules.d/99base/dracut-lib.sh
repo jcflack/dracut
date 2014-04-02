@@ -561,7 +561,7 @@ nfsroot_to_var() {
     # check if we have a server
     if strstr "$arg" ':/*' ; then
         server="${arg%%:/*}"
-        arg="/${arg##*:/}"
+        arg="/${arg#*:/}"
     fi
 
     path="${arg%%:*}"
@@ -569,9 +569,9 @@ nfsroot_to_var() {
     # rest are options
     options="${arg#"$path"}"
     # strip leading ":"
-    options="${options##:}"
+    options="${options#:}"
     # strip  ":"
-    options="${options%%:}"
+    options="${options%:}"
 
     # Does it really start with '/'?
     [ -n "${path%%/*}" ] && path="error";
