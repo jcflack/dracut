@@ -627,7 +627,7 @@ funiq() {
     [ -d "${dir}" ] || return 1
 
     while [ -e "${dir}/${prefix}$i" ]; do
-        i=$(($i+1)) || return 1
+        i=$((i+1)) || return 1
     done
 
     echo "${dir}/${prefix}$i"
@@ -955,7 +955,7 @@ wait_for_loginit()
             [ -z "${j##*Running*}" ] || break
         fi
         sleep 0.1
-        i=$(($i+1))
+        i=$((i+1))
     done
 
     if [ $i -eq 10 ]; then
