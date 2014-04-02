@@ -173,7 +173,7 @@ getarg() {
     while [ $# -gt 0 ]; do
         case $1 in
             -d) _deprecated=1; shift;;
-            -y) if _dogetarg $2 >/dev/null; then
+            -y) if _dogetarg "$2" >/dev/null; then
                     if [ "$_deprecated" = "1" ]; then
                         [ -n "$_newoption" ] && warn "Kernel command line option '$2' is deprecated, use '$_newoption' instead." || warn "Option '$2' is deprecated."
                     fi
@@ -183,7 +183,7 @@ getarg() {
                 fi
                 _deprecated=0
                 shift 2;;
-            -n) if _dogetarg $2 >/dev/null; then
+            -n) if _dogetarg "$2" >/dev/null; then
                     echo 0;
                     if [ "$_deprecated" = "1" ]; then
                         [ -n "$_newoption" ] && warn "Kernel command line option '$2' is deprecated, use '$_newoption=0' instead." || warn "Option '$2' is deprecated."
@@ -196,7 +196,7 @@ getarg() {
             *)  if [ -z "$_newoption" ]; then
                     _newoption="$1"
                 fi
-                if _dogetarg $1; then
+                if _dogetarg "$1"; then
                     if [ "$_deprecated" = "1" ]; then
                         [ -n "$_newoption" ] && warn "Kernel command line option '$1' is deprecated, use '$_newoption' instead." || warn "Option '$1' is deprecated."
                     fi
@@ -226,9 +226,9 @@ getargbool() {
     _b=$(getarg "$@")
     [ $? -ne 0 -a -z "$_b" ] && _b="$_default"
     if [ -n "$_b" ]; then
-        [ $_b = "0" ] && return 1
-        [ $_b = "no" ] && return 1
-        [ $_b = "off" ] && return 1
+        [ "$_b" = "0" ] && return 1
+        [ "$_b" = "no" ] && return 1
+        [ "$_b" = "off" ] && return 1
     fi
     return 0
 }
@@ -413,7 +413,7 @@ source_hook() {
 
 check_finished() {
     local f
-    for f in $hookdir/initqueue/finished/*.sh; do
+    for f in "$hookdir/initqueue/finished/"*.sh; do
         [ "$f" = "$hookdir/initqueue/finished/*.sh" ] && return 0
         { [ -e "$f" ] && ( . "$f" ) ; } || return 1
     done
@@ -511,9 +511,9 @@ udevproperty() {
     [ -z "$UDEVVERSION" ] && export UDEVVERSION=$(udevadm --version)
 
     if [ $UDEVVERSION -ge 143 ]; then
-        for i in "$@"; do udevadm control --property=$i; done
+        for i in "$@"; do udevadm control --property="$i"; done
     else
-        for i in "$@"; do udevadm control --env=$i; done
+        for i in "$@"; do udevadm control --env="$i"; done
     fi
 }
 
@@ -738,7 +738,7 @@ $(readlink -e -q "$d")" || return 255
 
 usable_root() {
     local _d
-    [ -d $1 ] || return 1
+    [ -d "$1" ] || return 1
     for _d in proc sys dev; do
         [ -e "$1"/$_d ] || return 1
     done
@@ -875,24 +875,24 @@ wait_for_dev()
     printf '[ -e "%s" ]\n' $1 \
         >> "${PREFIX}$hookdir/initqueue/finished/devexists-${_name}.sh"
     {
-        printf '[ -e "%s" ] || ' $1
-        printf 'warn "\"%s\" does not exist"\n' $1
+        printf '[ -e "%s" ] || ' "$1"
+        printf 'warn "\"%s\" does not exist"\n' "$1"
     } >> "${PREFIX}$hookdir/emergency/80-${_name}.sh"
 
     if [ -n "$DRACUT_SYSTEMD" ]; then
         _name=$(dev_unit_name "$1")
-        if ! [ -L ${PREFIX}/etc/systemd/system/initrd.target.wants/${_name}.device ]; then
-            [ -d ${PREFIX}/etc/systemd/system/initrd.target.wants ] || mkdir -p ${PREFIX}/etc/systemd/system/initrd.target.wants
-            ln -s ../${_name}.device ${PREFIX}/etc/systemd/system/initrd.target.wants/${_name}.device
+        if ! [ -L "${PREFIX}/etc/systemd/system/initrd.target.wants/${_name}.device" ]; then
+            [ -d "${PREFIX}/etc/systemd/system/initrd.target.wants" ] || mkdir -p "${PREFIX}/etc/systemd/system/initrd.target.wants"
+            ln -s "../${_name}.device" "${PREFIX}/etc/systemd/system/initrd.target.wants/${_name}.device"
             _needreload=1
         fi
 
-        if ! [ -f ${PREFIX}/etc/systemd/system/${_name}.device.d/timeout.conf ]; then
-            mkdir -p ${PREFIX}/etc/systemd/system/${_name}.device.d
+        if ! [ -f "${PREFIX}/etc/systemd/system/${_name}.device.d/timeout.conf" ]; then
+            mkdir -p "${PREFIX}/etc/systemd/system/${_name}.device.d"
             {
                 echo "[Unit]"
                 echo "JobTimeoutSec=0"
-            } > ${PREFIX}/etc/systemd/system/${_name}.device.d/timeout.conf
+            } > "${PREFIX}/etc/systemd/system/${_name}.device.d/timeout.conf"
             _needreload=1
         fi
 
@@ -910,8 +910,8 @@ cancel_wait_for_dev()
     rm -f -- "$hookdir/emergency/80-${_name}.sh"
     if [ -n "$DRACUT_SYSTEMD" ]; then
         _name=$(dev_unit_name "$1")
-        rm -f -- ${PREFIX}/etc/systemd/system/initrd.target.wants/${_name}.device
-        rm -f -- ${PREFIX}/etc/systemd/system/${_name}.device.d/timeout.conf
+        rm -f -- "${PREFIX}/etc/systemd/system/initrd.target.wants/${_name}.device"
+        rm -f -- "${PREFIX}/etc/systemd/system/${_name}.device.d/timeout.conf"
         /sbin/initqueue --onetime --unique --name daemon-reload systemctl daemon-reload
     fi
 }
@@ -1053,7 +1053,7 @@ emergency_shell()
     echo
 
     if getargbool 1 rd.shell -d -y rdshell || getarg rd.break -d rdbreak; then
-        _emergency_shell $_rdshell_name
+        _emergency_shell "$_rdshell_name"
     else
         warn "$action has failed. To debug this issue add \"rd.shell rd.debug\" to the kernel command line."
         # cause a kernel panic
