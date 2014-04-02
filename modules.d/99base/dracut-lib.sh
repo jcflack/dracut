@@ -22,17 +22,17 @@ debug_on() {
 
 # returns OK if $1 contains $2
 strstr() {
-    [ "${1#*$2*}" != "$1" ]
+    [ "${1#*"$2"*}" != "$1" ]
 }
 
 # returns OK if $1 contains $2 at the beginning
 str_starts() {
-    [ "${1#$2*}" != "$1" ]
+    [ "${1#"$2"*}" != "$1" ]
 }
 
 # returns OK if $1 contains $2 at the end
 str_ends() {
-    [ "${1%*$2}" != "$1" ]
+    [ "${1%*"$2"}" != "$1" ]
 }
 
 if [ -z "$DRACUT_SYSTEMD" ]; then
@@ -85,9 +85,9 @@ str_replace() {
     local out=''
 
     while strstr "${in}" "$s"; do
-        chop="${in%%$s*}"
+        chop="${in%%"$s"*}"
         out="${out}${chop}$r"
-        in="${in#*$s}"
+        in="${in#*"$s"}"
     done
     echo "${out}${in}"
 }
@@ -336,12 +336,12 @@ getoptcomma() {
     local line=",$1,"; local opt="$2"; local tmp
 
     case "${line}" in
-        *,${opt}=*,*)
-            tmp="${line#*,${opt}=}"
+        *,"${opt}"=*,*)
+            tmp="${line#*,"$opt"=}"
             echo "${tmp%%,*}"
             return 0
             ;;
-        *,${opt},*) return 0;;
+        *,"${opt}",*) return 0;;
     esac
     return 1
 }
@@ -365,10 +365,10 @@ splitsep() {
     local tmp
 
     while [ -n "$str" -a "$#" -gt 1 ]; do
-        tmp="${str%%$sep*}"
+        tmp="${str%%"$sep"*}"
         eval "$1='${tmp}'"
         str="${str#"$tmp"}"
-        str="${str#$sep}"
+        str="${str#"$sep"}"
         shift
     done
     [ -n "$str" -a -n "$1" ] && eval "$1='$str'"
@@ -470,9 +470,9 @@ check_occurances() {
     local expected="$3"
     local count=0
 
-    while [ "${str#*$ch}" != "${str}" ]; do
-        str="${str#*$ch}"
-        count=$(( $count + 1 ))
+    while [ "${str#*"$ch"}" != "${str}" ]; do
+        str="${str#*"$ch"}"
+        count=$(( count + 1 ))
     done
 
     [ $count -eq $expected ]
@@ -552,7 +552,7 @@ nfsroot_to_var() {
     # strip nfs[4]:
     local arg="$@:"
     nfs="${arg%%:*}"
-    arg="${arg##$nfs:}"
+    arg="${arg#"$nfs":}"
 
     # check if we have a server
     if strstr "$arg" ':/*' ; then
@@ -563,7 +563,7 @@ nfsroot_to_var() {
     path="${arg%%:*}"
 
     # rest are options
-    options="${arg##$path}"
+    options="${arg#"$path"}"
     # strip leading ":"
     options="${options##:}"
     # strip  ":"
