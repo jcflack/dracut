@@ -57,7 +57,7 @@ else
     }
 
     info() {
-        echo "$*"
+        printf '%s\n' "$*"
     }
 
 fi
@@ -161,7 +161,7 @@ _dogetarg() {
         fi
     done
     if [ -n "$_val" ]; then
-        [ "x$_doecho" != "x" ] && echo "$_val";
+        [ "$_doecho" != "" ] && printf '%s\n' "$_val";
         return 0;
     fi
     return 1;
@@ -259,7 +259,7 @@ getargnum() {
         isdigit "$_b" && _b=$(($_b)) && \
           [ $_b -ge $_min ] && [ $_b -le $_max ] && echo $_b && return
     fi
-    echo $_default
+    printf '%s\n' "$_default"
 }
 
 _dogetargs() {
@@ -279,7 +279,7 @@ _dogetargs() {
         fi
     done
     if [ -n "$_found" ]; then
-        [ $# -gt 0 ] && echo -n "$@"
+        [ $# -gt 0 ] && printf '%s' "$@"
         return 0
     fi
     return 1;
@@ -310,9 +310,9 @@ getargs() {
     done
     if [ -n "$_gfound" ]; then
         if [ $# -gt 0 ]; then
-            echo -n "$@"
+            printf '%s' "$@"
         else
-            echo -n 1
+            printf 1
         fi
         debug_on
         return 0
@@ -521,7 +521,7 @@ find_mount() {
     local dev mnt etc wanted_dev
     wanted_dev="$(readlink -e -q $1)"
     while read dev mnt etc; do
-        [ "$dev" = "$wanted_dev" ] && echo "$dev" && return 0
+        [ "$dev" = "$wanted_dev" ] && printf '%s\n' "$dev" && return 0
     done < /proc/mounts
     return 1
 }
@@ -731,7 +731,7 @@ devnames() {
 $(readlink -e -q "$d")" || return 255
     done
 
-    echo "${names#
+    printf '%s\n' "${names#
 }"
 }
 
@@ -956,7 +956,7 @@ wait_for_loginit()
 
     if [ $i -eq 10 ]; then
         kill %1 >/dev/null 2>&1
-        kill $(while read line;do echo $line;done</run/initramfs/loginit.pid)
+        kill $(while read line;do printf '%s\n' "$line";done</run/initramfs/loginit.pid)
     fi
 
     setdebug
@@ -1200,7 +1200,7 @@ make_trace()
 
         if [ $insert_trace -eq 1 ]; then
             if [ $msg_printed -eq 0 ]; then
-                echo "$prefix $msg"
+                printf '%s\n' "$prefix $msg"
                 msg_printed=1
             fi
             $func $trace
