@@ -63,14 +63,14 @@ else
 fi
 
 vwarn() {
-    while read line; do
-        warn $line;
+    while IFS= read -r line; do
+        warn "$line";
     done
 }
 
 vinfo() {
-    while read line; do
-        info $line;
+    while IFS= read -r line; do
+        info "$line";
     done
 }
 
