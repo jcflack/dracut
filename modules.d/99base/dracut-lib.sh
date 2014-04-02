@@ -244,8 +244,9 @@ isdigit() {
 # getargnum <defaultval> <minval> <maxval> <arg>
 # Will echo the arg if it's in range [minval - maxval].
 # If it's not set or it's not valid, will set it <defaultval>.
+# XXX does it make sense to silently replace an invalid value with default??
 # Note all values are required to be >= 0 here.
-# <defaultval> should be with [minval -maxval].
+# <defaultval> should be within [minval..maxval] but this is not enforced.
 getargnum() {
     local _b
     unset _b
@@ -1179,7 +1180,7 @@ make_trace()
         return
     fi
 
-    msg=$(echo $msg)
+    msg=$(echo $msg) # is this just to collapse whitespace?
 
     msg_printed=0
     while [ $# -gt 0 ]; do
