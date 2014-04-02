@@ -1118,9 +1118,9 @@ listlist() {
     [ "$_list" = "$_sublist" ] && return 0
 
     for _v in $_sublist; do
-        if [ -n "$_v" ] && ! ( [ -n "$_iglist" ] && strstr "$_iglist" "$_v" )
+        if [ -n "$_v" ] && ! strstr "$_iglist" "$_sep$_v$_sep"
         then
-            strstr "$_list" "$_v" || return 1
+            strstr "$_list" "$_sep$_v$_sep" || return 1
         fi
     done
 
