@@ -349,7 +349,7 @@ getoptcomma() {
 # Splits given string 'str' with separator 'sep' into variables 'var1', 'var2',
 # 'varN'.  If number of fields is less than number of variables, remaining are
 # not set.  If number of fields is greater than number of variables, the last
-# variable takes remaining fields.  In short - it acts similary to 'read'.
+# variable takes remaining fields.  In short - it acts similarly to 'read'.
 #
 # splitsep sep str var1 var2 varN
 #
@@ -462,7 +462,7 @@ check_quiet() {
 }
 
 
-check_occurances() {
+check_occurrences() {
     # Count the number of times the character $ch occurs in $str
     # Return 0 if the count matches the expected number, 1 otherwise
     local str="$1"
@@ -476,6 +476,10 @@ check_occurances() {
     done
 
     [ $count -eq $expected ]
+}
+
+check_occurances() {
+	check_occurrences "$@"
 }
 
 incol2() {
