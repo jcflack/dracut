@@ -574,7 +574,7 @@ nfsroot_to_var() {
     options="${options%:}"
 
     # Does it really start with '/'?
-    [ -n "${path%%/*}" ] && path="error";
+    str_starts "$path" '/' || path="error";
 
     #Fix kernel legacy style separating path and options with ','
     if [ "$path" != "${path#*,}" ] ; then
