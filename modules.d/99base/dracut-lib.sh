@@ -1093,9 +1093,10 @@ export_n()
     local var
     local val
     for var in "$@"; do
-        eval val=\$$var
+        unset val
+		eval [ -z "\${$var+set}" ] '||' val=\$$var
         unset $var
-        [ -n "$val" ] && eval $var=\"$val\"
+        [ -n "${val+set}" ] && eval $var=\$val
     done
 }
 
